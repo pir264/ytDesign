@@ -1,0 +1,77 @@
+/* Injected into youtube.com at document_start: hide YouTube's own UI and, while playing,
+   stretch YouTube's player over the whole screen underneath the TV UI.
+   Ctrl+Shift+Y adds .yttv-off to <html> and brings normal YouTube back. */
+
+html:not(.yttv-off),
+html:not(.yttv-off) body {
+  background: #0a1a36 !important;
+  overflow: hidden !important;
+}
+
+html:not(.yttv-off) ytd-app {
+  visibility: hidden !important;
+}
+
+#yttv-host {
+  position: fixed !important;
+  inset: 0 !important;
+  z-index: 2147483647 !important;
+  display: block !important;
+  background: #0a1a36;
+  overflow: clip;
+}
+
+html.yttv-play #yttv-host {
+  background: transparent;
+}
+
+html.yttv-off #yttv-host {
+  display: none !important;
+}
+
+/* ---- player, full screen ---- */
+
+html.yttv-play:not(.yttv-off) [yttv-anc] {
+  transform: none !important;
+  filter: none !important;
+  contain: none !important;
+  will-change: auto !important;
+}
+
+html.yttv-play:not(.yttv-off) #movie_player {
+  visibility: visible !important;
+  position: fixed !important;
+  inset: 0 !important;
+  width: 100vw !important;
+  height: 100vh !important;
+  max-width: none !important;
+  max-height: none !important;
+  z-index: 2147483000 !important;
+  background: #05101f !important;
+}
+
+html.yttv-play:not(.yttv-off) #movie_player .html5-video-container,
+html.yttv-play:not(.yttv-off) #movie_player video.html5-main-video {
+  position: absolute !important;
+  left: 0 !important;
+  top: 0 !important;
+  width: 100vw !important;
+  height: 100vh !important;
+}
+
+html.yttv-play:not(.yttv-off) #movie_player video.html5-main-video {
+  object-fit: contain !important;
+}
+
+/* YouTube's own player chrome: our overlay replaces it. Captions, spinner and errors stay. */
+html:not(.yttv-off) #movie_player :is(
+  .ytp-chrome-top, .ytp-chrome-bottom, .ytp-gradient-top, .ytp-gradient-bottom,
+  .ytp-pause-overlay, .ytp-bezel, .ytp-bezel-text-wrapper, .ytp-doubletap-ui-legacy,
+  .ytp-ce-element, .ytp-endscreen-content, .ytp-autonav-endscreen-countdown-overlay,
+  .ytp-cards-teaser, .ytp-cards-button, .ytp-paid-content-overlay, .ytp-watermark,
+  .iv-branding, .ytp-iv-player-content, .ytp-suggested-action, .ytp-tooltip,
+  .ytp-contextmenu, .ytp-popup, .ytp-overlay-bottom-right, .ytp-fullerscreen-edu-button,
+  .ytp-chapter-container, .ytp-player-content.ytp-timely-actions-content
+) {
+  display: none !important;
+}

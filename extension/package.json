@@ -1,0 +1,31 @@
+{
+  "name": "youtube-tv",
+  "version": "0.1.0",
+  "description": "YouTube TV interface as a Firefox extension",
+  "scripts": {
+    "build": "node build.mjs",
+    "watch": "node build.mjs --watch",
+    "test": "vitest run",
+    "typecheck": "tsc",
+    "lint": "web-ext lint -s dist",
+    "start": "web-ext run -s dist --url https://www.youtube.com/",
+    "package": "node build.mjs && web-ext build -s dist -a artifacts --overwrite-dest",
+    "sign": "npm run build && npm run source-zip && web-ext sign -s dist -a artifacts --channel=unlisted --upload-source-code artifacts/source.zip",
+    "dev": "node build.mjs --dev && python3 -m http.server 5173 -d devdist",
+    "dev:build": "node build.mjs --dev",
+    "source-zip": "rm -f artifacts/source.zip && mkdir -p artifacts && zip -qr artifacts/source.zip src dev static test build.mjs package.json package-lock.json tsconfig.json README.md BUILD.md",
+    "scrub-fixtures": "node scripts/scrub-fixtures.mjs"
+  },
+  "type": "module",
+  "dependencies": {
+    "preact": "^10.29.8"
+  },
+  "devDependencies": {
+    "@fontsource/montserrat": "^5.3.0",
+    "esbuild": "^0.28.2",
+    "typescript": "^7.0.2",
+    "vitest": "^5.0.3",
+    "web-ext": "^10.7.0"
+  },
+  "private": true
+}

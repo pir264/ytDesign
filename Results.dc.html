@@ -1,0 +1,85 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>YouTube TV – Search results</title>
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;600;700;900&amp;display=swap" rel="stylesheet">
+<style>
+body{margin:0}
+</style>
+</helmet>
+<div style="width: 1920px; height: 1080px; box-sizing: border-box; background: #0a1a36; color: #ffffff; font-family: Montserrat, 'Helvetica Neue', Arial, sans-serif; position: relative; overflow: hidden">
+
+  <!-- Compact search: query kept, bar recedes -->
+  <div style="display: flex; align-items: center; gap: 24px; padding: 48px 96px 0 96px; height: 72px">
+    <button style="display: flex; align-items: center; gap: 16px; height: 64px; padding: 0 28px 0 22px; border-radius: 32px; border: 2px solid rgba(255,255,255,.18); background: transparent; color: #ffffff; font-family: inherit; font-size: 26px; font-weight: 600; cursor: pointer" aria-label="Edit search (press S)" onClick="{{openSearch}}">
+      <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="#b9cbe2" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="7"></circle><path d="m20 20-3.5-3.5"></path></svg>
+      <span>lofi coding music 24/7 live</span>
+    </button>
+    <span style="font-size: 24px; color: #b9cbe2">48 results</span>
+  </div>
+
+  <!-- Focused result details -->
+  <div style="padding: 48px 96px 0 96px; height: 196px; box-sizing: border-box; display: flex; flex-direction: column; gap: 14px">
+    <h1 style="margin: 0; font-size: 52px; line-height: 1.15; font-weight: 900; max-width: 1500px">{{focused.title}}</h1>
+    <div style="display: flex; gap: 28px; align-items: center; font-size: 28px; font-weight: 500; color: #b9cbe2">
+      <span>{{focused.channel}}</span>
+      <sc-if value="{{focused.live}}" hint-placeholder-val="{{true}}">
+        <span style="padding: 2px 14px; border-radius: 8px; background: #ed7126; color: #0a1a36; font-weight: 800; font-size: 22px">LIVE</span>
+      </sc-if>
+      <span>{{focused.dur}}</span>
+    </div>
+  </div>
+
+  <!-- Grid 4 × 2 -->
+  <div style="padding: 40px 96px 0 96px; display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); column-gap: 40px; row-gap: 48px">
+    <sc-for list="{{items}}" as="v" hint-placeholder-count="8">
+      <button style="{{v.tileStyle}}" onClick="{{v.play}}" aria-label="Play {{v.title}}">
+        <div style="{{v.thumbStyle}}">
+          <svg width="56" height="56" viewBox="0 0 24 24" fill="rgba(255,255,255,.35)"><path d="M8 5v14l11-7z"></path></svg>
+          <span style="position: absolute; right: 12px; bottom: 12px; padding: 4px 10px; border-radius: 6px; background: rgba(0,0,0,.75); font-size: 22px; font-weight: 700">{{v.dur}}</span>
+        </div>
+        <div style="font-size: 26px; font-weight: 600; line-height: 1.3; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden">{{v.title}}</div>
+      </button>
+    </sc-for>
+  </div>
+
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"focusColor":{"editor":"color","default":"#ed7126","options":["#ed7126","#ffffff","#7d9ac4"]},"onPlay":{"editor":null},"onSearch":{"editor":null},"$preview":{"width":1920,"height":1080}}'>
+class Component extends DCLogic {
+  renderVals() {
+    const ring = this.props.focusColor ?? '#ed7126';
+    const vids = [
+      { title: 'lofi hip hop radio – beats to code to', channel: 'Chillhop Music', dur: 'LIVE', live: true, c: '#1d4180' },
+      { title: 'Synthwave for programming – 3 hours', channel: 'Neon Nights', dur: '3:02:11', c: '#2b569c' },
+      { title: 'Deep focus: ambient study mix', channel: 'Ambient Lab', dur: '1:58:40', c: '#143062' },
+      { title: 'Coffee shop jazz while coding', channel: 'Café Sessions', dur: '2:00:00', c: '#0f2450' },
+      { title: 'Night drive lofi playlist', channel: 'Late Drive', dur: '1:12:34', c: '#143062' },
+      { title: 'Chill beats for late night debugging', channel: 'Chillhop Music', dur: '58:20', c: '#1d4180' },
+      { title: 'Rainy day coding session', channel: 'Ambient Lab', dur: '2:30:00', c: '#0f2450' },
+      { title: 'Minimal techno for deep work', channel: 'Deep Work FM', dur: '1:45:09', c: '#2b569c' }
+    ];
+    const sel = (this.state && this.state.sel) || 0;
+    const items = vids.map((v, i) => {
+      const f = i === sel;
+      return {
+        ...v,
+        play: () => { this.setState({ sel: i }); if (this.props.onPlay) this.props.onPlay({ title: v.title, channel: v.channel, dur: v.dur, p: 0, c: v.c }); },
+        tileStyle: 'display: flex; flex-direction: column; gap: 16px; transform-origin: left top; border: 0; background: none; padding: 0; margin: 0; color: inherit; font: inherit; text-align: left; cursor: pointer;' + (f ? ' transform: scale(1.05);' : ' opacity: .8;'),
+        thumbStyle: 'position: relative; aspect-ratio: 16 / 9; border-radius: 16px; overflow: hidden; display: flex; align-items: center; justify-content: center; background: ' + v.c + ';' + (f ? ' outline: 6px solid ' + ring + '; outline-offset: 4px; box-shadow: 0 24px 60px rgba(0,0,0,.5);' : '')
+      };
+    });
+    const openSearch = () => { if (this.props.onSearch) this.props.onSearch(); };
+    return { items, openSearch, focused: vids[sel] };
+  }
+}
+</script>
+</body>
+</html>

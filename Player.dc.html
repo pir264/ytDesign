@@ -1,0 +1,146 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>YouTube TV – Player</title>
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;600;700;900&amp;display=swap" rel="stylesheet">
+<style>
+body{margin:0}
+</style>
+</helmet>
+<div style="width: 1920px; height: 1080px; box-sizing: border-box; background: #05101f; color: #ffffff; font-family: Montserrat, 'Helvetica Neue', Arial, sans-serif; position: relative; overflow: hidden">
+
+  <!-- Video fills the whole screen -->
+  <div style="{{videoStyle}}">[ VIDEO ]</div>
+
+  <!-- Top: back -->
+  <div style="position: absolute; left: 0; right: 0; top: 0; height: 200px; background: linear-gradient(to bottom, rgba(5,16,31,.85) 0%, rgba(5,16,31,0) 100%)"></div>
+  <button onClick="{{back}}" aria-label="Back (Esc)" style="position: absolute; left: 96px; top: 56px; display: flex; align-items: center; gap: 16px; height: 72px; padding: 0 32px 0 24px; border-radius: 36px; border: 0; background: rgba(255,255,255,.14); color: #ffffff; font-family: inherit; font-size: 28px; font-weight: 600; cursor: pointer">
+    <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M19 12H5"></path><path d="m12 19-7-7 7-7"></path></svg>
+    <span>Back</span>
+    <span style="display: inline-flex; align-items: center; height: 36px; padding: 0 10px; border-radius: 8px; background: rgba(255,255,255,.14); font-size: 20px; font-weight: 700">Esc</span>
+  </button>
+
+  <!-- Bottom overlay: appears on any key, hides after 4 s -->
+  <div style="position: absolute; left: 0; right: 0; bottom: 0; height: 420px; background: linear-gradient(to top, rgba(5,16,31,.95) 0%, rgba(5,16,31,.85) 55%, rgba(5,16,31,0) 100%)"></div>
+
+  <div style="{{ctrlStyle}}">
+    <div style="display: flex; flex-direction: column; gap: 10px">
+      <h1 style="margin: 0; font-size: 48px; line-height: 1.15; font-weight: 900">{{v.title}}</h1>
+      <div style="font-size: 28px; font-weight: 500; color: #b9cbe2">{{v.channel}}</div>
+    </div>
+
+    <!-- Progress -->
+    <div style="display: flex; align-items: center; gap: 32px; font-size: 28px; font-weight: 600; font-variant-numeric: tabular-nums">
+      <span>{{elapsed}}</span>
+      <div style="position: relative; flex: 1; height: 10px; border-radius: 5px; background: rgba(255,255,255,.25)">
+        <div style="{{barStyle}}"></div>
+        <div style="{{knobStyle}}"></div>
+      </div>
+      <span style="color: #b9cbe2">{{v.dur}}</span>
+    </div>
+
+    <!-- Controls -->
+    <div style="display: flex; align-items: center; justify-content: center; gap: 40px">
+      <button aria-label="Back 10 seconds" style="width: 88px; height: 88px; border-radius: 50%; border: 0; background: rgba(255,255,255,.12); color: #ffffff; display: flex; align-items: center; justify-content: center; cursor: pointer">
+        <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 12a9 9 0 1 0 3-6.7L3 8"></path><path d="M3 3v5h5"></path></svg>
+      </button>
+      <button aria-label="{{playLabel}}" onClick="{{togglePlay}}" style="width: 120px; height: 120px; border-radius: 50%; border: 0; background: #ffffff; color: #0a1a36; display: flex; align-items: center; justify-content: center; cursor: pointer; outline: 6px solid {{focusColor}}; outline-offset: 6px">
+        <sc-if value="{{playing}}" hint-placeholder-val="{{true}}">
+          <svg width="52" height="52" viewBox="0 0 24 24" fill="currentColor"><rect x="6" y="5" width="4" height="14" rx="1"></rect><rect x="14" y="5" width="4" height="14" rx="1"></rect></svg>
+        </sc-if>
+        <sc-if value="{{paused}}" hint-placeholder-val="{{false}}">
+          <svg width="52" height="52" viewBox="0 0 24 24" fill="currentColor"><path d="M8 5v14l11-7z"></path></svg>
+        </sc-if>
+      </button>
+      <button aria-label="Forward 10 seconds" style="width: 88px; height: 88px; border-radius: 50%; border: 0; background: rgba(255,255,255,.12); color: #ffffff; display: flex; align-items: center; justify-content: center; cursor: pointer">
+        <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12a9 9 0 1 1-3-6.7L21 8"></path><path d="M21 3v5h-5"></path></svg>
+      </button>
+    </div>
+
+  </div>
+  <!-- Details button + side panel -->
+  <button onClick="{{toggleDetails}}" aria-label="Details and comments" style="position: absolute; right: 96px; top: 56px; display: flex; align-items: center; gap: 14px; height: 72px; padding: 0 28px 0 22px; border-radius: 36px; border: 0; background: rgba(255,255,255,.14); color: #ffffff; font-family: inherit; font-size: 26px; font-weight: 600; cursor: pointer">
+    <svg width="30" height="30" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12a9 9 0 1 1-18 0 9 9 0 0 1 18 0zM12 11v6M12 7.5v.5"></path></svg>
+    <span>Details</span>
+  </button>
+  <sc-if value="{{detailsOpen}}" hint-placeholder-val="{{false}}">
+    <aside aria-label="Video details" style="position: absolute; top: 0; right: 0; bottom: 0; width: 640px; box-sizing: border-box; padding: 48px 48px 0 48px; background: #0a1a36; box-shadow: -24px 0 60px rgba(0,0,0,.45); display: flex; flex-direction: column; gap: 32px; overflow: hidden">
+      <div style="display: flex; align-items: center; justify-content: space-between">
+        <h2 style="margin: 0; font-size: 32px; font-weight: 800">Details</h2>
+        <button onClick="{{toggleDetails}}" aria-label="Close details" style="width: 64px; height: 64px; border-radius: 50%; border: 0; background: rgba(255,255,255,.12); color: #ffffff; display: flex; align-items: center; justify-content: center; cursor: pointer">
+          <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round"><path d="M6 6l12 12M18 6 6 18"></path></svg>
+        </button>
+      </div>
+      <div style="display: flex; align-items: center; gap: 20px">
+        <div style="flex: 0 0 80px; height: 80px; border-radius: 50%; background: #2b569c; display: flex; align-items: center; justify-content: center; font-size: 34px; font-weight: 800">{{chInitial}}</div>
+        <div style="flex: 1; min-width: 0; display: flex; flex-direction: column; gap: 4px">
+          <div style="font-size: 28px; font-weight: 700; white-space: nowrap; overflow: hidden; text-overflow: ellipsis">{{video.channel}}</div>
+          <div style="font-size: 22px; font-weight: 500; color: #b9cbe2">{{chSubs}}</div>
+        </div>
+        <button onClick="{{goChannel}}" style="flex: 0 0 auto; height: 60px; padding: 0 24px; border-radius: 30px; border: 2px solid rgba(255,255,255,.3); background: transparent; color: #ffffff; font-family: inherit; font-size: 22px; font-weight: 700; cursor: pointer">Go to channel</button>
+      </div>
+      <div style="font-size: 24px; line-height: 1.5; color: #dde7f2; display: -webkit-box; -webkit-line-clamp: 5; -webkit-box-orient: vertical; overflow: hidden">{{desc}}</div>
+      <div style="height: 2px; background: rgba(255,255,255,.12)"></div>
+      <div style="font-size: 26px; font-weight: 700">Comments <span style="color: #b9cbe2; font-weight: 500">· 1,284</span></div>
+      <div style="display: flex; flex-direction: column; gap: 28px">
+        <sc-for list="{{comments}}" as="cm" hint-placeholder-count="3">
+          <div style="display: flex; gap: 16px">
+            <div style="flex: 0 0 48px; height: 48px; border-radius: 50%; background: #1d4180; display: flex; align-items: center; justify-content: center; font-size: 22px; font-weight: 800">{{cm.initial}}</div>
+            <div style="display: flex; flex-direction: column; gap: 6px; min-width: 0">
+              <div style="font-size: 22px; font-weight: 600; color: #b9cbe2">{{cm.name}}</div>
+              <div style="font-size: 24px; line-height: 1.4; display: -webkit-box; -webkit-line-clamp: 3; -webkit-box-orient: vertical; overflow: hidden">{{cm.text}}</div>
+            </div>
+          </div>
+        </sc-for>
+      </div>
+    </aside>
+  </sc-if>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"focusColor":{"editor":"color","default":"#ed7126","options":["#ed7126","#ffffff","#7d9ac4"]},"detailsOpen":{"editor":"boolean","default":true},"video":{"editor":null},"onBack":{"editor":null},"$preview":{"width":1920,"height":1080}}'>
+class Component extends DCLogic {
+  renderVals() {
+    const detailsVals = (vid, open, toggle, goChannel) => ({
+      detailsOpen: open,
+      toggleDetails: toggle,
+      goChannel,
+      chInitial: String(vid.channel || '?').charAt(0),
+      chSubs: '412K subscribers',
+      desc: vid.desc || ('A deep dive from ' + vid.channel + '. The uploader\u2019s full description appears here: what the video covers, chapter times, links and credits. Long descriptions are cut off after five lines on the TV.'),
+      comments: [
+        { name: 'Sanne de Vries', initial: 'S', text: 'Watched this twice and still picked up something new the second time.' },
+        { name: 'mkdir_matt', initial: 'M', text: 'The part around the middle finally made it click for me. Great pacing.' },
+        { name: 'Jonas', initial: 'J', text: 'Production quality keeps getting better every upload.' }
+      ],
+      ctrlStyle: 'position: absolute; left: 96px; right: ' + (open ? 736 : 96) + 'px; bottom: 64px; display: flex; flex-direction: column; gap: 28px'
+    });
+    const ring = this.props.focusColor ?? '#ed7126';
+    const v = this.props.video ?? { title: 'How a CPU actually executes your code', channel: 'Core Dumped', dur: '18:42', p: 35, c: '#143062' };
+    const p = v.p ?? 0;
+    const playing = !(this.state && this.state.paused);
+    const toSec = (s) => String(s).split(':').reduce((a, n) => a * 60 + (parseInt(n, 10) || 0), 0);
+    const fmt = (t) => { const h = Math.floor(t / 3600), m = Math.floor(t % 3600 / 60), s = t % 60; const pad = (n) => String(n).padStart(2, '0'); return h ? h + ':' + pad(m) + ':' + pad(s) : m + ':' + pad(s); };
+    const elapsed = v.dur === 'LIVE' ? 'LIVE' : fmt(Math.round(toSec(v.dur) * p / 100));
+    const open = (this.state && this.state.details != null) ? this.state.details : (this.props.detailsOpen ?? true);
+    return {
+      ...detailsVals(v, open, () => this.setState({ details: !open }), () => {}),
+      v, video: v, focusColor: ring, playing, paused: !playing, elapsed,
+      playLabel: playing ? 'Pause' : 'Play',
+      togglePlay: () => this.setState({ paused: playing }),
+      back: () => { if (this.props.onBack) this.props.onBack(); },
+      videoStyle: 'position: absolute; inset: 0; display: flex; align-items: center; justify-content: center; background: ' + (v.c || '#143062') + '; color: rgba(255,255,255,.25); font-size: 32px; font-weight: 600; letter-spacing: .1em',
+      barStyle: 'position: absolute; left: 0; top: 0; bottom: 0; width: ' + p + '%; border-radius: 5px; background: ' + ring,
+      knobStyle: 'position: absolute; left: ' + p + '%; top: 50%; width: 28px; height: 28px; margin: -14px 0 0 -14px; border-radius: 50%; background: #ffffff'
+    };
+  }
+}
+</script>
+</body>
+</html>

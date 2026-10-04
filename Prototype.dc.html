@@ -1,0 +1,405 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>YouTube TV – Prototype</title>
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;600;700;900&amp;display=swap" rel="stylesheet">
+<style>
+body{margin:0}
+.yt-tile{border:0;background:none;padding:0;margin:0;color:inherit;font:inherit;text-align:left;cursor:pointer;display:flex;flex-direction:column;gap:16px;transform-origin:left top;transition:transform .15s ease,opacity .15s ease}
+.yt-key{padding:4px 12px;border-radius:8px;background:rgba(255,255,255,.12);color:#fff;font-weight:700}
+.yt-hint{display:flex;align-items:center;gap:12px}
+</style>
+</helmet>
+<div style="width: 1920px; height: 1080px; position: relative; overflow: hidden; background: #0a1a36; color: #ffffff; font-family: Montserrat, 'Helvetica Neue', Arial, sans-serif">
+
+  <!-- ============ HOME ============ -->
+  <sc-if value="{{showHome}}" hint-placeholder-val="{{true}}">
+    <div style="position: absolute; inset: 0; padding-top: 120px; box-sizing: border-box; display: flex; flex-direction: column">
+      <div style="padding: 56px 96px 0 96px; height: 220px; box-sizing: border-box; display: flex; flex-direction: column; gap: 16px">
+        <div style="font-size: 22px; font-weight: 700; letter-spacing: .14em; text-transform: uppercase; color: #ed7126">Continue watching</div>
+        <h1 style="margin: 0; font-size: 56px; line-height: 1.15; font-weight: 900; max-width: 1400px">{{homeFocus.title}}</h1>
+        <div style="display: flex; gap: 28px; font-size: 28px; font-weight: 500; color: #b9cbe2">
+          <span>{{homeFocus.channel}}</span><span>{{homeFocus.dur}}</span><span>{{homeFocus.p}}% watched</span>
+        </div>
+      </div>
+      <div style="padding: 48px 0 0 96px; display: flex; flex-direction: column; gap: 24px">
+        <h2 style="margin: 0; font-size: 34px; font-weight: 700">Continue watching</h2>
+        <div style="display: flex; gap: 40px">
+          <sc-for list="{{homeItems}}" as="v" hint-placeholder-count="5">
+            <button class="yt-tile" style="{{v.tileStyle}}" onClick="{{v.play}}" onMouseEnter="{{v.hover}}">
+              <div style="{{v.thumbStyle}}">
+                <svg width="64" height="64" viewBox="0 0 24 24" fill="rgba(255,255,255,.35)"><path d="M8 5v14l11-7z"></path></svg>
+                <span style="position: absolute; right: 12px; bottom: 12px; padding: 4px 10px; border-radius: 6px; background: rgba(0,0,0,.75); font-size: 22px; font-weight: 700">{{v.dur}}</span>
+                <div style="position: absolute; left: 0; bottom: 0; height: 8px; width: 100%; background: rgba(255,255,255,.2)"><div style="{{v.progStyle}}"></div></div>
+              </div>
+              <div style="font-size: 26px; font-weight: 600; line-height: 1.3; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden">{{v.title}}</div>
+            </button>
+          </sc-for>
+        </div>
+      </div>
+      <div style="padding: 48px 0 0 96px; display: flex; flex-direction: column; gap: 24px; opacity: .55">
+        <h2 style="margin: 0; font-size: 34px; font-weight: 700">Subscriptions</h2>
+        <div style="display: flex; gap: 40px">
+          <div style="flex: 0 0 400px; height: 225px; border-radius: 16px; background: #143062"></div>
+          <div style="flex: 0 0 400px; height: 225px; border-radius: 16px; background: #0f2450"></div>
+          <div style="flex: 0 0 400px; height: 225px; border-radius: 16px; background: #1d4180"></div>
+          <div style="flex: 0 0 400px; height: 225px; border-radius: 16px; background: #143062"></div>
+          <div style="flex: 0 0 400px; height: 225px; border-radius: 16px; background: #0f2450"></div>
+        </div>
+      </div>
+    </div>
+  </sc-if>
+
+  <!-- ============ SEARCH ============ -->
+  <sc-if value="{{showSearch}}" hint-placeholder-val="{{false}}">
+    <div style="position: absolute; inset: 0; background: #0a1a36">
+      <div style="position: relative; padding: 120px 0 0 0; display: flex; flex-direction: column; align-items: center; gap: 40px">
+        <div style="display: flex; align-items: center; gap: 32px; width: 1440px; height: 136px; box-sizing: border-box; padding: 0 48px; border-radius: 68px; background: #ffffff; color: #143062; outline: 6px solid #ed7126; outline-offset: 6px; box-shadow: 0 30px 80px rgba(0,0,0,.45)">
+          <svg width="56" height="56" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="7"></circle><path d="m20 20-3.5-3.5"></path></svg>
+          <span style="flex: 1; font-size: 60px; font-weight: 600">lofi coding mu<span style="display: inline-block; width: 4px; height: 64px; margin-left: 4px; vertical-align: -10px; background: #ed7126"></span></span>
+          <button onClick="{{showResults}}" style="height: 72px; padding: 0 32px; border-radius: 36px; border: 0; background: #143062; color: #ffffff; font-family: inherit; font-size: 26px; font-weight: 700; cursor: pointer">Search</button>
+          <button onClick="{{back}}" aria-label="Close search" style="width: 72px; height: 72px; border-radius: 50%; border: 0; background: #f1f6fa; color: #143062; display: flex; align-items: center; justify-content: center; cursor: pointer">
+            <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round"><path d="M6 6l12 12M18 6 6 18"></path></svg>
+          </button>
+        </div>
+        <div style="width: 1440px; display: flex; flex-direction: column; gap: 8px">
+          <sc-for list="{{sugg}}" as="s" hint-placeholder-count="5">
+            <button style="{{s.style}}" onClick="{{showResults}}">
+              <svg width="36" height="36" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="7"></circle><path d="m20 20-3.5-3.5"></path></svg>
+              <span><b style="font-weight: 800">lofi coding mu</b>{{s.rest}}</span>
+            </button>
+          </sc-for>
+        </div>
+      </div>
+    </div>
+  </sc-if>
+
+  <!-- ============ RESULTS ============ -->
+  <sc-if value="{{showResultsView}}" hint-placeholder-val="{{false}}">
+    <div style="position: absolute; inset: 0; padding-top: 120px; box-sizing: border-box; background: #0a1a36">
+      <div style="padding: 40px 96px 0 96px; height: 204px; box-sizing: border-box; display: flex; flex-direction: column; gap: 12px">
+        <div style="font-size: 22px; font-weight: 700; letter-spacing: .14em; text-transform: uppercase; color: #ed7126">Results for “lofi coding music 24/7 live” · 48</div>
+        <h1 style="margin: 0; font-size: 52px; line-height: 1.15; font-weight: 900; max-width: 1500px">{{resFocus.title}}</h1>
+        <div style="display: flex; gap: 28px; align-items: center; font-size: 28px; font-weight: 500; color: #b9cbe2">
+          <span>{{resFocus.channel}}</span><span>{{resFocus.dur}}</span>
+        </div>
+      </div>
+      <div style="padding: 40px 96px 0 96px; display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); column-gap: 40px; row-gap: 48px">
+        <sc-for list="{{resItems}}" as="v" hint-placeholder-count="8">
+          <button class="yt-tile" style="{{v.tileStyle}}" onClick="{{v.play}}" onMouseEnter="{{v.hover}}">
+            <div style="{{v.thumbStyle}}">
+              <svg width="56" height="56" viewBox="0 0 24 24" fill="rgba(255,255,255,.35)"><path d="M8 5v14l11-7z"></path></svg>
+              <span style="position: absolute; right: 12px; bottom: 12px; padding: 4px 10px; border-radius: 6px; background: rgba(0,0,0,.75); font-size: 22px; font-weight: 700">{{v.dur}}</span>
+            </div>
+            <div style="font-size: 26px; font-weight: 600; line-height: 1.3; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden">{{v.title}}</div>
+          </button>
+        </sc-for>
+      </div>
+    </div>
+  </sc-if>
+
+  <!-- ============ LIBRARY PAGES: History / Playlists / Subscriptions ============ -->
+  <sc-if value="{{showLibrary}}" hint-placeholder-val="{{false}}">
+    <div style="position: absolute; inset: 0; padding-top: 120px; box-sizing: border-box; background: #0a1a36">
+      <div style="padding: 40px 96px 0 96px; display: flex; flex-direction: column; gap: 8px">
+        <h1 style="margin: 0; font-size: 48px; line-height: 1.15; font-weight: 900">{{pageTitle}}</h1>
+        <div style="font-size: 26px; font-weight: 500; color: #b9cbe2">{{pageSub}}</div>
+      </div>
+
+      <!-- Subscriptions: channel strip -->
+      <sc-if value="{{showSubs}}" hint-placeholder-val="{{false}}">
+        <div style="padding: 32px 96px 0 96px; display: flex; gap: 40px">
+          <sc-for list="{{channels}}" as="ch" hint-placeholder-count="7">
+            <div style="display: flex; flex-direction: column; align-items: center; gap: 12px; width: 140px">
+              <div style="{{ch.avatarStyle}}">{{ch.initial}}</div>
+              <div style="font-size: 22px; font-weight: 600; color: #b9cbe2; text-align: center; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; width: 100%">{{ch.name}}</div>
+            </div>
+          </sc-for>
+        </div>
+      </sc-if>
+
+      <div style="padding: 32px 96px 0 96px; display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); column-gap: 40px; row-gap: 48px">
+        <sc-for list="{{pageItems}}" as="v" hint-placeholder-count="8">
+          <button class="yt-tile" style="{{v.tileStyle}}" onClick="{{v.play}}" onMouseEnter="{{v.hover}}">
+            <div style="{{v.thumbStyle}}">
+              <svg width="56" height="56" viewBox="0 0 24 24" fill="rgba(255,255,255,.35)"><path d="M8 5v14l11-7z"></path></svg>
+              <span style="position: absolute; right: 12px; bottom: 12px; padding: 4px 10px; border-radius: 6px; background: rgba(0,0,0,.75); font-size: 22px; font-weight: 700">{{v.badge}}</span>
+              <div style="position: absolute; left: 0; bottom: 0; height: 8px; width: 100%; background: rgba(255,255,255,.2)"><div style="{{v.progStyle}}"></div></div>
+            </div>
+            <div style="display: flex; flex-direction: column; gap: 4px">
+              <div style="font-size: 26px; font-weight: 600; line-height: 1.3; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden">{{v.title}}</div>
+              <div style="font-size: 22px; font-weight: 500; color: #b9cbe2">{{v.meta}}</div>
+            </div>
+          </button>
+        </sc-for>
+      </div>
+
+    </div>
+  </sc-if>
+
+  <!-- ============ SHARED TOP BAR (quiet) ============ -->
+  <sc-if value="{{showTopBar}}" hint-placeholder-val="{{true}}">
+    <div style="position: absolute; left: 0; right: 0; top: 0; height: 120px; box-sizing: border-box; padding: 48px 96px 0 96px; display: flex; align-items: center; gap: 40px; background: #0a1a36">
+      <button onClick="{{openSearch}}" aria-label="Search (press S)" style="display: flex; align-items: center; gap: 16px; height: 64px; padding: 0 28px 0 22px; border-radius: 32px; border: 2px solid rgba(255,255,255,.18); background: transparent; color: #b9cbe2; font-family: inherit; font-size: 24px; font-weight: 500; cursor: pointer">
+        <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="7"></circle><path d="m20 20-3.5-3.5"></path></svg>
+        <span>Search</span>
+        <span class="yt-key" style="font-size: 20px">S</span>
+      </button>
+      <nav aria-label="Library" style="display: flex; align-items: center; gap: 8px">
+        <sc-for list="{{navItems}}" as="n" hint-placeholder-count="4">
+          <button onClick="{{n.go}}" style="{{n.style}}">
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="{{n.d}}"></path></svg>
+            <span>{{n.label}}</span>
+          </button>
+        </sc-for>
+      </nav>
+      <div style="margin-left: auto; font-size: 28px; font-weight: 600; color: #b9cbe2">20:45</div>
+    </div>
+  </sc-if>
+
+  <!-- ============ PLAYER (full screen) ============ -->
+  <sc-if value="{{showPlayer}}" hint-placeholder-val="{{false}}">
+    <div style="position: absolute; inset: 0; background: #05101f">
+      <div style="{{videoStyle}}">[ VIDEO ]</div>
+      <div style="position: absolute; left: 0; right: 0; top: 0; height: 200px; background: linear-gradient(to bottom, rgba(5,16,31,.85) 0%, rgba(5,16,31,0) 100%)"></div>
+      <button onClick="{{back}}" aria-label="Back (Esc)" style="position: absolute; left: 96px; top: 56px; display: flex; align-items: center; gap: 16px; height: 72px; padding: 0 32px 0 24px; border-radius: 36px; border: 0; background: rgba(255,255,255,.14); color: #ffffff; font-family: inherit; font-size: 28px; font-weight: 600; cursor: pointer">
+        <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M19 12H5"></path><path d="m12 19-7-7 7-7"></path></svg>
+        <span>Back</span>
+        <span class="yt-key" style="font-size: 20px">Esc</span>
+      </button>
+      <div style="position: absolute; left: 0; right: 0; bottom: 0; height: 420px; background: linear-gradient(to top, rgba(5,16,31,.95) 0%, rgba(5,16,31,.85) 55%, rgba(5,16,31,0) 100%)"></div>
+      <div style="{{ctrlStyle}}">
+        <div style="display: flex; flex-direction: column; gap: 10px">
+          <h1 style="margin: 0; font-size: 48px; line-height: 1.15; font-weight: 900">{{video.title}}</h1>
+          <div style="font-size: 28px; font-weight: 500; color: #b9cbe2">{{video.channel}}</div>
+        </div>
+        <div style="display: flex; align-items: center; gap: 32px; font-size: 28px; font-weight: 600; font-variant-numeric: tabular-nums">
+          <span>{{elapsed}}</span>
+          <div style="position: relative; flex: 1; height: 10px; border-radius: 5px; background: rgba(255,255,255,.25)">
+            <div style="{{barStyle}}"></div>
+            <div style="{{knobStyle}}"></div>
+          </div>
+          <span style="color: #b9cbe2">{{video.dur}}</span>
+        </div>
+        <div style="display: flex; align-items: center; justify-content: center; gap: 40px">
+          <button aria-label="Back 10 seconds" style="width: 88px; height: 88px; border-radius: 50%; border: 0; background: rgba(255,255,255,.12); color: #ffffff; display: flex; align-items: center; justify-content: center; cursor: pointer">
+            <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 12a9 9 0 1 0 3-6.7L3 8"></path><path d="M3 3v5h5"></path></svg>
+          </button>
+          <button aria-label="Play or pause" onClick="{{togglePlay}}" style="width: 120px; height: 120px; border-radius: 50%; border: 0; background: #ffffff; color: #0a1a36; display: flex; align-items: center; justify-content: center; cursor: pointer; outline: 6px solid #ed7126; outline-offset: 6px">
+            <sc-if value="{{playing}}" hint-placeholder-val="{{true}}">
+              <svg width="52" height="52" viewBox="0 0 24 24" fill="currentColor"><rect x="6" y="5" width="4" height="14" rx="1"></rect><rect x="14" y="5" width="4" height="14" rx="1"></rect></svg>
+            </sc-if>
+            <sc-if value="{{paused}}" hint-placeholder-val="{{false}}">
+              <svg width="52" height="52" viewBox="0 0 24 24" fill="currentColor"><path d="M8 5v14l11-7z"></path></svg>
+            </sc-if>
+          </button>
+          <button aria-label="Forward 10 seconds" style="width: 88px; height: 88px; border-radius: 50%; border: 0; background: rgba(255,255,255,.12); color: #ffffff; display: flex; align-items: center; justify-content: center; cursor: pointer">
+            <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12a9 9 0 1 1-3-6.7L21 8"></path><path d="M21 3v5h-5"></path></svg>
+          </button>
+        </div>
+      </div>
+      <!-- Details button + side panel -->
+      <button onClick="{{toggleDetails}}" aria-label="Details and comments" style="position: absolute; right: 96px; top: 56px; display: flex; align-items: center; gap: 14px; height: 72px; padding: 0 28px 0 22px; border-radius: 36px; border: 0; background: rgba(255,255,255,.14); color: #ffffff; font-family: inherit; font-size: 26px; font-weight: 600; cursor: pointer">
+        <svg width="30" height="30" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12a9 9 0 1 1-18 0 9 9 0 0 1 18 0zM12 11v6M12 7.5v.5"></path></svg>
+        <span>Details</span>
+      </button>
+      <sc-if value="{{detailsOpen}}" hint-placeholder-val="{{false}}">
+        <aside aria-label="Video details" style="position: absolute; top: 0; right: 0; bottom: 0; width: 640px; box-sizing: border-box; padding: 48px 48px 0 48px; background: #0a1a36; box-shadow: -24px 0 60px rgba(0,0,0,.45); display: flex; flex-direction: column; gap: 32px; overflow: hidden">
+          <div style="display: flex; align-items: center; justify-content: space-between">
+            <h2 style="margin: 0; font-size: 32px; font-weight: 800">Details</h2>
+            <button onClick="{{toggleDetails}}" aria-label="Close details" style="width: 64px; height: 64px; border-radius: 50%; border: 0; background: rgba(255,255,255,.12); color: #ffffff; display: flex; align-items: center; justify-content: center; cursor: pointer">
+              <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round"><path d="M6 6l12 12M18 6 6 18"></path></svg>
+            </button>
+          </div>
+          <div style="display: flex; align-items: center; gap: 20px">
+            <div style="flex: 0 0 80px; height: 80px; border-radius: 50%; background: #2b569c; display: flex; align-items: center; justify-content: center; font-size: 34px; font-weight: 800">{{chInitial}}</div>
+            <div style="flex: 1; min-width: 0; display: flex; flex-direction: column; gap: 4px">
+              <div style="font-size: 28px; font-weight: 700; white-space: nowrap; overflow: hidden; text-overflow: ellipsis">{{video.channel}}</div>
+              <div style="font-size: 22px; font-weight: 500; color: #b9cbe2">{{chSubs}}</div>
+            </div>
+            <button onClick="{{goChannel}}" style="flex: 0 0 auto; height: 60px; padding: 0 24px; border-radius: 30px; border: 2px solid rgba(255,255,255,.3); background: transparent; color: #ffffff; font-family: inherit; font-size: 22px; font-weight: 700; cursor: pointer">Go to channel</button>
+          </div>
+          <div style="font-size: 24px; line-height: 1.5; color: #dde7f2; display: -webkit-box; -webkit-line-clamp: 5; -webkit-box-orient: vertical; overflow: hidden">{{desc}}</div>
+          <div style="height: 2px; background: rgba(255,255,255,.12)"></div>
+          <div style="font-size: 26px; font-weight: 700">Comments <span style="color: #b9cbe2; font-weight: 500">· 1,284</span></div>
+          <div style="display: flex; flex-direction: column; gap: 28px">
+            <sc-for list="{{comments}}" as="cm" hint-placeholder-count="3">
+              <div style="display: flex; gap: 16px">
+                <div style="flex: 0 0 48px; height: 48px; border-radius: 50%; background: #1d4180; display: flex; align-items: center; justify-content: center; font-size: 22px; font-weight: 800">{{cm.initial}}</div>
+                <div style="display: flex; flex-direction: column; gap: 6px; min-width: 0">
+                  <div style="font-size: 22px; font-weight: 600; color: #b9cbe2">{{cm.name}}</div>
+                  <div style="font-size: 24px; line-height: 1.4; display: -webkit-box; -webkit-line-clamp: 3; -webkit-box-orient: vertical; overflow: hidden">{{cm.text}}</div>
+                </div>
+              </div>
+            </sc-for>
+          </div>
+        </aside>
+      </sc-if>
+    </div>
+  </sc-if>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"$preview":{"width":1920,"height":1080}}'>
+class Component extends DCLogic {
+  st() {
+    return Object.assign({ screen: 'home', from: 'home', searchFrom: 'home', homeSel: 0, resSel: 0, video: null, paused: false }, this.state || {});
+  }
+  renderVals() {
+    const s = this.st();
+    const detailsVals = (vid, open, toggle, goChannel) => ({
+      detailsOpen: open,
+      toggleDetails: toggle,
+      goChannel,
+      chInitial: String(vid.channel || '?').charAt(0),
+      chSubs: '412K subscribers',
+      desc: vid.desc || ('A deep dive from ' + vid.channel + '. The uploader\u2019s full description appears here: what the video covers, chapter times, links and credits. Long descriptions are cut off after five lines on the TV.'),
+      comments: [
+        { name: 'Sanne de Vries', initial: 'S', text: 'Watched this twice and still picked up something new the second time.' },
+        { name: 'mkdir_matt', initial: 'M', text: 'The part around the middle finally made it click for me. Great pacing.' },
+        { name: 'Jonas', initial: 'J', text: 'Production quality keeps getting better every upload.' }
+      ],
+      ctrlStyle: 'position: absolute; left: 96px; right: ' + (open ? 736 : 96) + 'px; bottom: 64px; display: flex; flex-direction: column; gap: 28px'
+    });
+
+    const ring = '#ed7126';
+    const homeVids = [
+      { title: 'How a CPU actually executes your code', channel: 'Core Dumped', dur: '18:42', p: 35, c: '#1d4180' },
+      { title: 'Rebuilding my homelab rack from scratch', channel: 'Homelab Diaries', dur: '24:10', p: 70, c: '#2b569c' },
+      { title: 'Live at Paradiso – full concert', channel: 'Paradiso Live', dur: '1:32:05', p: 15, c: '#0f2450' },
+      { title: 'NixOS in 100 seconds', channel: 'Fireship', dur: '2:18', p: 50, c: '#143062' },
+      { title: 'Bread baking for absolute beginners', channel: 'Kitchen Basics', dur: '31:47', p: 20, c: '#1d4180' }
+    ];
+    const resVids = [
+      { title: 'lofi hip hop radio – beats to code to', channel: 'Chillhop Music', dur: 'LIVE', p: 100, c: '#1d4180' },
+      { title: 'Synthwave for programming – 3 hours', channel: 'Neon Nights', dur: '3:02:11', p: 0, c: '#2b569c' },
+      { title: 'Deep focus: ambient study mix', channel: 'Ambient Lab', dur: '1:58:40', p: 0, c: '#143062' },
+      { title: 'Coffee shop jazz while coding', channel: 'Café Sessions', dur: '2:00:00', p: 0, c: '#0f2450' },
+      { title: 'Night drive lofi playlist', channel: 'Late Drive', dur: '1:12:34', p: 0, c: '#143062' },
+      { title: 'Chill beats for late night debugging', channel: 'Chillhop Music', dur: '58:20', p: 0, c: '#1d4180' },
+      { title: 'Rainy day coding session', channel: 'Ambient Lab', dur: '2:30:00', p: 0, c: '#0f2450' },
+      { title: 'Minimal techno for deep work', channel: 'Deep Work FM', dur: '1:45:09', p: 0, c: '#2b569c' }
+    ];
+    const tile = (v, focused, w, scale) => ({
+      tileStyle: (w ? 'flex: 0 0 ' + w + 'px;' : '') + (focused ? ' transform: scale(' + scale + ');' : ' opacity: .8;'),
+      thumbStyle: 'position: relative; ' + (w ? 'height: 225px;' : 'aspect-ratio: 16 / 9;') + ' border-radius: 16px; overflow: hidden; display: flex; align-items: center; justify-content: center; background: ' + v.c + ';' + (focused ? ' outline: 6px solid ' + ring + '; outline-offset: 4px; box-shadow: 0 24px 60px rgba(0,0,0,.5);' : ''),
+      progStyle: 'height: 100%; width: ' + v.p + '%; background: ' + ring
+    });
+    const homeItems = homeVids.map((v, i) => Object.assign({}, v, tile(v, i === s.homeSel, 400, 1.06), {
+      hover: () => this.setState({ homeSel: i }),
+      play: () => this.setState({ homeSel: i, screen: 'player', from: 'home', video: v, paused: false, details: false })
+    }));
+    const resItems = resVids.map((v, i) => Object.assign({}, v, tile(v, i === s.resSel, 0, 1.05), {
+      hover: () => this.setState({ resSel: i }),
+      play: () => this.setState({ resSel: i, screen: 'player', from: 'results', video: v, paused: false, details: false })
+    }));
+    const sugg = ['sic', 'sic 24/7 live', 'sic for deep focus', 'sic no ads', 'sic 1 hour'].map((rest, i) => ({
+      rest,
+      style: 'display: flex; align-items: center; gap: 28px; width: 100%; height: 80px; padding: 0 40px; box-sizing: border-box; border: 0; border-radius: 40px; font-family: inherit; font-size: 36px; font-weight: 500; text-align: left; cursor: pointer; ' +
+        (i === 1 ? 'background: #1d4180; color: #ffffff; outline: 4px solid ' + ring + ';' : 'background: transparent; color: #b9cbe2;')
+    }));
+    // ---- Library pages ----
+    const lib = {
+      history: {
+        title: 'History', sub: 'Recently watched on this TV',
+        vids: [
+          { title: 'How a CPU actually executes your code', channel: 'Core Dumped', dur: '18:42', p: 35, c: '#1d4180', meta: 'Today · Core Dumped' },
+          { title: 'Rebuilding my homelab rack from scratch', channel: 'Homelab Diaries', dur: '24:10', p: 70, c: '#2b569c', meta: 'Today · Homelab Diaries' },
+          { title: 'Live at Paradiso – full concert', channel: 'Paradiso Live', dur: '1:32:05', p: 15, c: '#0f2450', meta: 'Yesterday · Paradiso Live' },
+          { title: 'NixOS in 100 seconds', channel: 'Fireship', dur: '2:18', p: 100, c: '#143062', meta: 'Yesterday · Fireship' },
+          { title: 'Synthwave for programming – 3 hours', channel: 'Neon Nights', dur: '3:02:11', p: 40, c: '#2b569c', meta: '2 days ago · Neon Nights' },
+          { title: 'Bread baking for absolute beginners', channel: 'Kitchen Basics', dur: '31:47', p: 20, c: '#1d4180', meta: '3 days ago · Kitchen Basics' },
+          { title: 'Proxmox clustering explained', channel: 'Homelab Diaries', dur: '27:03', p: 100, c: '#0f2450', meta: 'Last week · Homelab Diaries' },
+          { title: 'Coffee shop jazz while coding', channel: 'Café Sessions', dur: '2:00:00', p: 60, c: '#143062', meta: 'Last week · Café Sessions' }
+        ]
+      },
+      playlists: {
+        title: 'Playlists', sub: 'Plays from the first video',
+        vids: [
+          { title: 'Watch later', channel: 'Watch later', dur: '12:30', p: 0, c: '#1d4180', count: '14 videos', meta: 'Private' },
+          { title: 'Liked videos', channel: 'Liked videos', dur: '8:41', p: 0, c: '#2b569c', count: '86 videos', meta: 'Private' },
+          { title: 'Homelab builds', channel: 'Homelab builds', dur: '24:10', p: 0, c: '#0f2450', count: '23 videos', meta: 'Updated yesterday' },
+          { title: 'Focus music', channel: 'Focus music', dur: 'LIVE', p: 100, c: '#143062', count: '9 videos', meta: 'Updated last week' },
+          { title: 'Linux & open source', channel: 'Linux & open source', dur: '15:02', p: 0, c: '#2b569c', count: '31 videos', meta: 'Updated 2 weeks ago' },
+          { title: 'Concerts', channel: 'Concerts', dur: '1:32:05', p: 0, c: '#0f2450', count: '7 videos', meta: 'Updated last month' }
+        ]
+      },
+      subs: {
+        title: 'Subscriptions', sub: 'Latest from your channels',
+        vids: [
+          { title: 'I replaced my NAS with a mini PC', channel: 'Homelab Diaries', dur: '19:55', p: 0, c: '#1d4180', meta: 'Homelab Diaries · 3 hours ago' },
+          { title: 'Rust in 100 seconds', channel: 'Fireship', dur: '2:29', p: 0, c: '#2b569c', meta: 'Fireship · 6 hours ago' },
+          { title: 'How RAM actually works', channel: 'Core Dumped', dur: '22:14', p: 0, c: '#143062', meta: 'Core Dumped · Yesterday' },
+          { title: 'Sunday sourdough, start to finish', channel: 'Kitchen Basics', dur: '41:08', p: 0, c: '#0f2450', meta: 'Kitchen Basics · 2 days ago' }
+        ]
+      }
+    };
+    const isLib = !!lib[s.screen];
+    const page = isLib ? lib[s.screen] : lib.history;
+    const pageSel = (s[s.screen + 'Sel'] || 0);
+    const pageItems = page.vids.map((pv, i) => Object.assign({}, pv, tile(pv, isLib && i === pageSel, 0, 1.05), {
+      badge: pv.count || pv.dur,
+      hover: () => this.setState({ [s.screen + 'Sel']: i }),
+      play: () => this.setState({ [s.screen + 'Sel']: i, screen: 'player', from: s.screen, video: pv, paused: false, details: false })
+    }));
+    const channels = ['Homelab Diaries', 'Fireship', 'Core Dumped', 'Kitchen Basics', 'Paradiso Live', 'Neon Nights', 'Ambient Lab'].map((name, i) => ({
+      name, initial: name.charAt(0),
+      avatarStyle: 'width: 112px; height: 112px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 44px; font-weight: 800; color: #ffffff; background: ' + ['#1d4180', '#2b569c', '#143062', '#0f2450'][i % 4] + ';' + (i < 2 ? ' box-shadow: 0 0 0 4px #ed7126;' : '')
+    }));
+    const navDefs = [
+      { id: 'home', label: 'Home', d: 'M3 11l9-7 9 7M5 10v10h14V10' },
+      { id: 'history', label: 'History', d: 'M21 12a9 9 0 1 1-18 0 9 9 0 0 1 18 0zM12 7v5l3 2' },
+      { id: 'playlists', label: 'Playlists', d: 'M3 6h12M3 12h12M3 18h8M17 14v7l5-3.5z' },
+      { id: 'subs', label: 'Subscriptions', d: 'M3 5h18v12H3zM10 8.5l5 2.5-5 2.5zM8 21h8' }
+    ];
+    const navItems = navDefs.map((n) => {
+      const active = s.screen === n.id;
+      return Object.assign({}, n, {
+        go: () => this.setState({ screen: n.id }),
+        style: 'display: flex; align-items: center; gap: 10px; height: 56px; padding: 0 18px; border: 0; border-radius: 28px; font-family: inherit; font-size: 22px; font-weight: 600; cursor: pointer; ' +
+          (active ? 'background: rgba(255,255,255,.12); color: #ffffff;' : 'background: transparent; color: #7d9ac4;')
+      });
+    });
+
+    const v = s.video || homeVids[0];
+    const toSec = (d) => String(d).split(':').reduce((a, n) => a * 60 + (parseInt(n, 10) || 0), 0);
+    const pad = (n) => String(n).padStart(2, '0');
+    const fmt = (t) => { const h = Math.floor(t / 3600), m = Math.floor(t % 3600 / 60), sec = t % 60; return h ? h + ':' + pad(m) + ':' + pad(sec) : m + ':' + pad(sec); };
+    return {
+      showHome: s.screen === 'home',
+      showSearch: s.screen === 'search',
+      showResultsView: s.screen === 'results',
+      showPlayer: s.screen === 'player',
+      showLibrary: isLib,
+      showSubs: s.screen === 'subs',
+      showTopBar: s.screen !== 'player' && s.screen !== 'search',
+      pageTitle: page.title, pageSub: page.sub, pageItems, channels, navItems,
+      homeItems, resItems, sugg,
+      homeFocus: homeVids[s.homeSel], resFocus: resVids[s.resSel],
+      video: v,
+      ...detailsVals(v, !!s.details, () => this.setState({ details: !s.details }), () => this.setState({ screen: 'subs', details: false })),
+      playing: !s.paused, paused: s.paused,
+      elapsed: v.dur === 'LIVE' ? 'LIVE' : fmt(Math.round(toSec(v.dur) * v.p / 100)),
+      videoStyle: 'position: absolute; inset: 0; display: flex; align-items: center; justify-content: center; background: ' + v.c + '; color: rgba(255,255,255,.25); font-size: 32px; font-weight: 600; letter-spacing: .1em',
+      barStyle: 'position: absolute; left: 0; top: 0; bottom: 0; width: ' + v.p + '%; border-radius: 5px; background: ' + ring,
+      knobStyle: 'position: absolute; left: ' + v.p + '%; top: 50%; width: 28px; height: 28px; margin: -14px 0 0 -14px; border-radius: 50%; background: #ffffff',
+      togglePlay: () => this.setState({ paused: !s.paused }),
+      openSearch: () => this.setState({ screen: 'search', searchFrom: s.screen }),
+      showResults: () => this.setState({ screen: 'results' }),
+      back: () => {
+        if (s.screen === 'player') this.setState({ screen: s.from, details: false });
+        else if (s.screen === 'search') this.setState({ screen: s.searchFrom || 'home' });
+        else this.setState({ screen: 'home' });
+      }
+    };
+  }
+}
+</script>
+</body>
+</html>

@@ -1,0 +1,7 @@
+[Desktop Entry]
+Type=Application
+Name=YouTube TV
+Comment=YouTube on the TV (Firefox kiosk)
+Exec=sh -c 'sleep 3; exec firefox --kiosk https://www.youtube.com/'
+Icon=firefox
+X-GNOME-Autostart-enabled=true

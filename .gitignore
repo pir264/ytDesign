@@ -1,0 +1,22 @@
+# dependencies and build output
+node_modules/
+extension/dist/
+extension/devdist/
+
+# signed builds and the source zip sent to Mozilla (release files, not source)
+extension/artifacts/
+*.xpi
+.web-extension-id
+
+# secrets: never commit API keys (web-ext reads WEB_EXT_API_KEY / WEB_EXT_API_SECRET from the environment)
+.env
+.env.*
+.web-ext-config.*
+web-ext-config.*
+
+# local tool and editor settings
+.claude/
+.vscode/
+.idea/
+*.log
+.DS_Store

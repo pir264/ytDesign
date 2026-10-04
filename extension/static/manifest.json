@@ -1,0 +1,66 @@
+{
+  "manifest_version": 3,
+  "name": "TV Mode for YouTube",
+  "version": "0.1.0",
+  "description": "A 10-foot YouTube interface for a TV, driven by keyboard, D-pad or air mouse.",
+  "icons": {
+    "96": "icon.svg"
+  },
+  "browser_specific_settings": {
+    "gecko": {
+      "id": "youtube-tv@ytdesign.local",
+      "strict_min_version": "140.0",
+      "data_collection_permissions": {
+        "required": [
+          "searchTerms"
+        ]
+      }
+    }
+  },
+  "permissions": [
+    "storage"
+  ],
+  "host_permissions": [
+    "https://www.youtube.com/*",
+    "https://suggestqueries-clients6.youtube.com/*"
+  ],
+  "background": {
+    "scripts": [
+      "background.js"
+    ]
+  },
+  "content_scripts": [
+    {
+      "matches": [
+        "https://www.youtube.com/*"
+      ],
+      "js": [
+        "bridge.js"
+      ],
+      "run_at": "document_start",
+      "world": "MAIN"
+    },
+    {
+      "matches": [
+        "https://www.youtube.com/*"
+      ],
+      "js": [
+        "content.js"
+      ],
+      "css": [
+        "page.css"
+      ],
+      "run_at": "document_start"
+    }
+  ],
+  "web_accessible_resources": [
+    {
+      "resources": [
+        "fonts/*"
+      ],
+      "matches": [
+        "https://www.youtube.com/*"
+      ]
+    }
+  ]
+}

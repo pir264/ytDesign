@@ -1,0 +1,34 @@
+{
+  "policies": {
+    "ExtensionSettings": {
+      "uBlock0@raymondhill.net": {
+        "installation_mode": "force_installed",
+        "install_url": "https://addons.mozilla.org/firefox/downloads/latest/ublock-origin/latest.xpi"
+      },
+      "youtube-tv@ytdesign.local": {
+        "installation_mode": "force_installed",
+        "install_url": "file:///opt/youtube-tv/youtube-tv.xpi"
+      }
+    },
+    "Preferences": {
+      "media.autoplay.default": { "Value": 0, "Status": "locked" },
+      "browser.sessionstore.resume_from_crash": { "Value": false, "Status": "locked" },
+      "browser.startup.homepage": { "Value": "https://www.youtube.com/", "Status": "default" }
+    },
+    "DisableTelemetry": true,
+    "DisableFirefoxStudies": true,
+    "DisablePocket": true,
+    "DontCheckDefaultBrowser": true,
+    "OverrideFirstRunPage": "",
+    "OverridePostUpdatePage": "",
+    "PasswordManagerEnabled": false,
+    "UserMessaging": {
+      "ExtensionRecommendations": false,
+      "FeatureRecommendations": false,
+      "UrlbarInterventions": false,
+      "SkipOnboarding": true,
+      "MoreFromMozilla": false,
+      "Locked": true
+    }
+  }
+}

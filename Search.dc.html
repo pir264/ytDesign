@@ -1,0 +1,74 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>YouTube TV – Search</title>
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;600;700;900&amp;display=swap" rel="stylesheet">
+<style>
+body{margin:0}
+</style>
+</helmet>
+<div style="width: 1920px; height: 1080px; box-sizing: border-box; background: #0a1a36; color: #ffffff; font-family: Montserrat, 'Helvetica Neue', Arial, sans-serif; position: relative; overflow: hidden">
+
+  <!-- Dimmed home behind -->
+  <div style="position: absolute; left: 96px; top: 560px; display: flex; gap: 40px; opacity: .12">
+    <div style="width: 400px; height: 225px; border-radius: 16px; background: #2b569c"></div>
+    <div style="width: 400px; height: 225px; border-radius: 16px; background: #2b569c"></div>
+    <div style="width: 400px; height: 225px; border-radius: 16px; background: #2b569c"></div>
+    <div style="width: 400px; height: 225px; border-radius: 16px; background: #2b569c"></div>
+  </div>
+
+  <div style="position: relative; padding: 120px 0 0 0; display: flex; flex-direction: column; align-items: center; gap: 40px">
+
+    <!-- Prominent search bar -->
+    <label for="q" style="display: flex; align-items: center; gap: 32px; width: 1440px; height: 136px; box-sizing: border-box; padding: 0 48px; border-radius: 68px; background: #ffffff; color: #143062; outline: 6px solid {{focusColor}}; outline-offset: 6px; box-shadow: 0 30px 80px rgba(0,0,0,.45)">
+      <svg width="56" height="56" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="7"></circle><path d="m20 20-3.5-3.5"></path></svg>
+      <input id="q" value="lofi coding mu" aria-label="Search YouTube" style="flex: 1; min-width: 0; border: 0; outline: 0; background: transparent; font-family: inherit; font-size: 60px; font-weight: 600; color: #143062">
+      <span style="font-size: 24px; font-weight: 600; color: #4a5b78; white-space: nowrap">Enter to search</span>
+    </label>
+
+    <!-- Suggestions -->
+    <div style="width: 1440px; display: flex; flex-direction: column; gap: 8px">
+      <sc-for list="{{sugg}}" as="s" hint-placeholder-count="5">
+        <button style="{{s.style}}" onClick="{{submit}}">
+          <svg width="36" height="36" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="7"></circle><path d="m20 20-3.5-3.5"></path></svg>
+          <span><b style="font-weight: 800">{{s.typed}}</b>{{s.rest}}</span>
+        </button>
+      </sc-for>
+    </div>
+
+    <!-- Recent -->
+    <div style="width: 1440px; display: flex; align-items: center; gap: 20px; flex-wrap: wrap; font-size: 26px; color: #b9cbe2">
+      <span style="font-weight: 600">Recent</span>
+      <span style="padding: 10px 24px; border-radius: 28px; border: 2px solid rgba(255,255,255,.24)">homelab tour</span>
+      <span style="padding: 10px 24px; border-radius: 28px; border: 2px solid rgba(255,255,255,.24)">kubernetes explained</span>
+      <span style="padding: 10px 24px; border-radius: 28px; border: 2px solid rgba(255,255,255,.24)">jazz live</span>
+    </div>
+  </div>
+
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"focusColor":{"editor":"color","default":"#ed7126","options":["#ed7126","#ffffff","#7d9ac4"]},"onSubmit":{"editor":null},"$preview":{"width":1920,"height":1080}}'>
+class Component extends DCLogic {
+  renderVals() {
+    const ring = this.props.focusColor ?? '#ed7126';
+    const typed = 'lofi coding mu';
+    const rests = ['sic', 'sic 24/7 live', 'sic for deep focus', 'sic no ads', 'sic 1 hour'];
+    const sugg = rests.map((rest, i) => ({
+      typed, rest,
+      style: 'display: flex; align-items: center; gap: 28px; width: 100%; height: 80px; padding: 0 40px; box-sizing: border-box; border: 0; border-radius: 40px; font-family: inherit; font-size: 36px; font-weight: 500; text-align: left; cursor: pointer; ' +
+        (i === 1 ? 'background: #1d4180; color: #ffffff; outline: 4px solid ' + ring + ';' : 'background: transparent; color: #b9cbe2;')
+    }));
+    const submit = () => { if (this.props.onSubmit) this.props.onSubmit(); };
+    return { sugg, focusColor: ring, submit };
+  }
+}
+</script>
+</body>
+</html>
