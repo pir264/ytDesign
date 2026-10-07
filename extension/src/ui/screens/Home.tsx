@@ -10,6 +10,8 @@ interface Row {
   title: string;
   items: Item[];
   loading: boolean;
+  /** recommendation rows after the first "More for you" continue without a heading */
+  headless?: boolean;
   /** load the next page of this row's feed */
   more?: () => void;
 }
@@ -39,6 +41,7 @@ export function Home() {
       title: i === 0 ? 'Recommended' : 'More for you',
       items: rec.items.slice(i * REC_ROW, (i + 1) * REC_ROW),
       loading: rec.loading,
+      headless: i > 1,
     });
   }
   const shown = rows.filter((r) => r.items.length);
@@ -82,8 +85,8 @@ export function Home() {
       <div class="rows">
         {loggedIn === false && focusedItem && <SignIn focused={f === 'signin'} compact />}
         {shown.map((row, ri) => (
-          <section key={row.id} class={cls('hrow', row !== activeRow && 'dim')}>
-            <h2>{row.title}</h2>
+          <section key={row.id} class={cls('hrow', row !== activeRow && 'dim', row.headless && 'headless')}>
+            {!row.headless && <h2>{row.title}</h2>}
             <div class="hrow-scroll">
               <div class="hrow-track">
                 {row.items.map((item, i) => (

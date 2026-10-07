@@ -402,6 +402,11 @@ img {
   scroll-margin: 105px 96px 0 96px;
 }
 
+.hrow.headless .tile {
+  /* no heading above: align the tiles themselves near the top */
+  scroll-margin-top: 40px;
+}
+
 .hrow .tile.focused {
   transform: scale(1.06);
 }
