@@ -1,6 +1,6 @@
 {
   "name": "youtube-tv",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "description": "YouTube TV interface as a Firefox extension",
   "scripts": {
     "build": "node build.mjs",
