@@ -94,6 +94,18 @@ voordat je commit: opgeslagen responses bevatten je IP-adres en een YouTube bezo
 
    Zet daarnaast in Mint's *Energiebeheer* en *Schermbeveiliging* het uitschakelen van het scherm uit.
 
+## Nieuwe versie naar de NUC
+
+Met SSH-toegang (met sleutel) tot de NUC gaat het met één commando: de nieuwste `.xpi` uit
+`artifacts/` gaat naar de NUC en Firefox herstart daar met de nieuwe versie.
+
+```bash
+npm run deploy -- mint      # "mint" = je SSH-host (naam of IP) van de NUC
+```
+
+Eenmalig op de NUC, zodat er geen `sudo` nodig is: `sudo chown -R "$USER" /opt/youtube-tv`.
+Firefox installeert de extensie opnieuw zodra het bestand op het pad uit `policies.json` verandert.
+
 ## Privacy en gegevens
 
 Het manifest geeft `searchTerms` op bij `data_collection_permissions`. Wat je in het zoekveld typt,

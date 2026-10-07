@@ -14,7 +14,8 @@
     "dev": "node build.mjs --dev && python3 -m http.server 5173 -d devdist",
     "dev:build": "node build.mjs --dev",
     "source-zip": "rm -f artifacts/source.zip && mkdir -p artifacts && zip -qr artifacts/source.zip src dev static test build.mjs package.json package-lock.json tsconfig.json README.md BUILD.md",
-    "scrub-fixtures": "node scripts/scrub-fixtures.mjs"
+    "scrub-fixtures": "node scripts/scrub-fixtures.mjs",
+    "deploy": "bash scripts/deploy.sh"
   },
   "type": "module",
   "dependencies": {
