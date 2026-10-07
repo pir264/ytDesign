@@ -4,7 +4,7 @@ import type { ComponentChildren } from 'preact';
 import { useEffect, useState } from 'preact/hooks';
 import { api, type ChannelHeader } from '../../data/api';
 import type { Channel, Item } from '../../data/parse';
-import { cls, Grid, itemFid, Status, SURFACES, useFocused, videoMeta } from '../components';
+import { cls, Grid, itemFid, Status, SURFACES, useFocused, useVideoMeta } from '../components';
 import { invalidate, useAsync, useFeed } from '../data';
 import { setFocus } from '../focus';
 import { openChannel } from '../nav';
@@ -15,6 +15,7 @@ export function Results({ route }: { route: Route }) {
   const f = useFocused();
   const feed = useFeed('results:' + q, (cont) => api.search(q, cont));
   const item = feed.items.find((i) => itemFid('grid', i) === f) ?? feed.items[0];
+  const meta = useVideoMeta(item);
   return (
     <div class="screen results">
       <div class="results-head">
@@ -23,7 +24,7 @@ export function Results({ route }: { route: Route }) {
         </div>
         <h1 class="d-title small">{item?.title ?? ' '}</h1>
         <div class="d-meta">
-          {videoMeta(item)
+          {meta
             .filter((m) => !m.endsWith('watched'))
             .map((m) => (
               <span key={m}>{m}</span>

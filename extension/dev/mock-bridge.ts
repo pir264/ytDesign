@@ -88,7 +88,7 @@ async function api(endpoint: string, body: any): Promise<string> {
   else if (body.browseId === 'FEplaylist_aggregation') {
     const s = await fixture('search');
     json = { items: [s, s] }; // playlists (Mixes) from the search fixture
-  } else if (body.browseId === 'FEwhat_to_watch') json = await fixture('search');
+  } else if (body.browseId === 'FEwhat_to_watch') json = { a: await fixture('search'), b: await fixture('channel') }; // ~50 videos
   else json = await fixture('channel');
   return JSON.stringify(json);
 }

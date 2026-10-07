@@ -14,6 +14,8 @@ export interface Video {
   thumb: string;
   live?: boolean;
   meta?: string;
+  /** when it was uploaded, as YouTube words it ("3 days ago", "4mo ago") */
+  published?: string;
   /** date section in history ("Today", "Yesterday") */
   section?: string;
   startTime?: number;
@@ -130,6 +132,11 @@ function videoThumb(id: string): string {
   return `https://i.ytimg.com/vi/${id}/hqdefault.jpg`;
 }
 
+/** "3 days ago", "4mo ago", "2 jaar geleden", "Streamed 5 hours ago", "Oct 24, 2009" */
+const DATE = /\b(ago|geleden)\b|^(streamed|premiered|uitgezonden)\b|^\w{3,9}\.? \d{1,2}, \d{4}$|^\d{1,2} \w{3,9}\.? \d{4}$/i;
+/** view counts and other numbers: "1.2M views", "3.9M", "12K watching" */
+const COUNT = /^[\d.,\s]+\s*[KMB]?\b|\b(views?|weergaven|watching|kijkers)\b/i;
+
 function isShortsEndpoint(ep: J): boolean {
   if (!ep) return false;
   if (ep.reelWatchEndpoint) return true;
@@ -161,6 +168,7 @@ function fromVideoRenderer(r: J): Video | null {
     thumb: best(r.thumbnail?.thumbnails) || videoThumb(r.videoId),
     live: live || undefined,
     meta: meta || undefined,
+    published: text(r.publishedTimeText) || undefined,
     startTime: r.navigationEndpoint?.watchEndpoint?.startTimeSeconds,
   };
 }
@@ -173,9 +181,10 @@ function fromLockup(l: J): Item | null {
 
   const md = l.metadata?.lockupMetadataViewModel;
   const title = text(md?.title);
-  const rows: string[][] = (md?.metadata?.contentMetadataViewModel?.metadataRows ?? [])
+  const rowParts: J[][] = (md?.metadata?.contentMetadataViewModel?.metadataRows ?? [])
     .filter((r: J) => !r.isSpacerRow && r.metadataParts)
-    .map((r: J) => r.metadataParts.map((p: J) => text(p.text)).filter(Boolean));
+    .map((r: J) => r.metadataParts);
+  const rows: string[][] = rowParts.map((r) => r.map((p: J) => text(p.text)).filter(Boolean));
 
   const image =
     l.contentImage?.thumbnailViewModel ?? l.contentImage?.collectionThumbnailViewModel?.primaryThumbnail?.thumbnailViewModel;
@@ -189,11 +198,13 @@ function fromLockup(l: J): Item | null {
     const channelId = digAll(md?.metadata, 'browseEndpoint')
       .map((b) => b.browseId)
       .find((b: string) => b?.startsWith('UC'));
+    const parts = rows.flat();
     return {
       kind: 'video',
       id,
       title,
-      channel: rows.length >= 2 ? rows[0][0] : undefined,
+      channel: lockupChannel(rowParts, rows),
+      published: parts.find((p) => DATE.test(p)),
       channelId,
       duration: live ? 'LIVE' : badge,
       progress: progressBar?.startPercent,
@@ -215,6 +226,21 @@ function fromLockup(l: J): Item | null {
     };
   }
   return null;
+}
+
+/**
+ * The channel name in a lockup's metadata: the part that links to a channel; otherwise the first
+ * row when there are several (channel / views · date); otherwise a leading part that is clearly not
+ * a count or a date. On a channel's own page there is no channel name at all.
+ */
+function lockupChannel(rowParts: J[][], rows: string[][]): string | undefined {
+  for (const part of rowParts.flat()) {
+    const linked = digAll(part?.text?.commandRuns, 'browseId').some((b: string) => b?.startsWith('UC'));
+    if (linked) return text(part.text) || undefined;
+  }
+  const plain = (p?: string) => (p && !COUNT.test(p) && !DATE.test(p) ? p : undefined);
+  if (rows.length >= 2) return plain(rows[0][0]);
+  return rows[0]?.length >= 2 ? plain(rows[0][0]) : undefined;
 }
 
 function fromPlaylistRenderer(r: J): Playlist | null {

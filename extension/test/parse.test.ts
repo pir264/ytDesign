@@ -75,6 +75,69 @@ describe('parseItems', () => {
   });
 });
 
+describe('channel and upload date', () => {
+  const lockup = (rows: { content: string; channelId?: string }[][]) => ({
+    lockupViewModel: {
+      contentId: 'abcdefghijk',
+      contentType: 'LOCKUP_CONTENT_TYPE_VIDEO',
+      contentImage: { thumbnailViewModel: { image: { sources: [] }, overlays: [] } },
+      metadata: {
+        lockupMetadataViewModel: {
+          title: { content: 'A video' },
+          metadata: {
+            contentMetadataViewModel: {
+              metadataRows: rows.map((r) => ({
+                metadataParts: r.map((p) => ({
+                  text: {
+                    content: p.content,
+                    ...(p.channelId ? { commandRuns: [{ onTap: { innertubeCommand: { browseEndpoint: { browseId: p.channelId } } } }] } : {}),
+                  },
+                })),
+              })),
+            },
+          },
+        },
+      },
+    },
+  });
+  const parse = (rows: Parameters<typeof lockup>[0]) => parseItems({ items: [lockup(rows)] }).items[0];
+
+  it('reads them from the usual two rows', () => {
+    expect(parse([[{ content: 'Rick Astley' }], [{ content: '3.9M' }, { content: '4mo ago' }]])).toMatchObject({
+      channel: 'Rick Astley',
+      published: '4mo ago',
+    });
+  });
+
+  it('reads them from a single row', () => {
+    expect(parse([[{ content: 'Fireship' }, { content: '1.2M views' }, { content: '3 days ago' }]])).toMatchObject({
+      channel: 'Fireship',
+      published: '3 days ago',
+    });
+  });
+
+  it('prefers the part that links to a channel', () => {
+    expect(parse([[{ content: '1.2M views' }, { content: 'Core Dumped', channelId: 'UC123' }]])).toMatchObject({ channel: 'Core Dumped' });
+  });
+
+  it('finds no channel on a channel page (views and date only)', () => {
+    const v = parse([[{ content: '1.2M views' }, { content: '1 day ago' }]]);
+    expect(v).toMatchObject({ published: '1 day ago' });
+    expect(v.kind === 'video' && v.channel).toBeFalsy();
+  });
+
+  it('reads the upload date of search results', () => {
+    const videos = parseItems(fixture('search.json')).items.filter((i) => i.kind === 'video');
+    expect(videos.filter((v) => v.kind === 'video' && v.published).length).toBeGreaterThan(videos.length * 0.7);
+  });
+
+  it('reads channel and date of related videos', () => {
+    const related = parseItems(fixture('next.json')).items.filter((i) => i.kind === 'video');
+    expect(related.length).toBeGreaterThan(5);
+    for (const v of related) expect(v).toMatchObject({ channel: expect.any(String), published: expect.stringMatching(/ago/) });
+  });
+});
+
 describe('details and comments', () => {
   it('parses the next endpoint', () => {
     const d = parseDetails(fixture('next.json'), 'dQw4w9WgXcQ');

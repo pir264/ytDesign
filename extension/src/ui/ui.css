@@ -170,10 +170,19 @@ img {
 .d-meta {
   display: flex;
   gap: 28px;
+  max-width: 1728px;
+  overflow: hidden;
   font-size: 28px;
   font-weight: 500;
   color: #b9cbe2;
   white-space: nowrap;
+}
+
+.d-meta span {
+  flex: 0 1 auto;
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
 
 .details-block {

@@ -1,7 +1,7 @@
 import { useEffect, useRef } from 'preact/hooks';
 import { api } from '../../data/api';
 import type { Item } from '../../data/parse';
-import { cls, itemFid, Status, Tile, useFocused, videoMeta } from '../components';
+import { cls, itemFid, Status, Tile, useFocused, useVideoMeta } from '../components';
 import { useFeed } from '../data';
 import { useStore } from '../store';
 
@@ -55,6 +55,7 @@ export function Home() {
   const focusedItem = activeRow?.items[focusIndex];
 
   const loading = rows.some((r) => r.loading) || loggedIn === null;
+  const meta = useVideoMeta(focusedItem);
 
   // Endless, like YouTube: a row loads more near its right end, and more recommendation rows
   // appear while moving down.
@@ -73,7 +74,7 @@ export function Home() {
             <div class="eyebrow">{activeRow.title}</div>
             <h1 class="d-title">{focusedItem.title}</h1>
             <div class="d-meta">
-              {videoMeta(focusedItem).map((m) => (
+              {meta.map((m) => (
                 <span key={m}>{m}</span>
               ))}
             </div>

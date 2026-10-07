@@ -28,6 +28,8 @@ const VIDEOS_TAB = 'EgZ2aWRlb3PyBgQKAjoA';
 
 export type ChannelHeader = ReturnType<typeof parseChannelHeader> & { subscribed?: boolean };
 
+const detailsCache = new Map<string, Promise<Details>>();
+
 const LIBRARY_PLAYLISTS: Playlist[] = [
   { kind: 'playlist', id: 'WL', title: 'Watch later', thumb: '', meta: 'Private' },
   { kind: 'playlist', id: 'LL', title: 'Liked videos', thumb: '', meta: 'Private' },
@@ -70,8 +72,16 @@ export const api = {
     return parseGuideSubscriptions(await call('guide', {}));
   },
 
-  async details(videoId: string): Promise<Details> {
-    return parseDetails(await call('next', { videoId }), videoId);
+  /** Cached per video: the details block on Home asks for it too, and so does the details panel. */
+  details(videoId: string): Promise<Details> {
+    let p = detailsCache.get(videoId);
+    if (!p) {
+      p = call('next', { videoId }).then((json) => parseDetails(json, videoId));
+      p.catch(() => detailsCache.delete(videoId));
+      detailsCache.set(videoId, p);
+      if (detailsCache.size > 200) detailsCache.delete(detailsCache.keys().next().value!);
+    }
+    return p;
   },
 
   /** A page of comments, or of replies to one comment. */

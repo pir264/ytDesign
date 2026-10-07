@@ -1,5 +1,6 @@
 import type { ComponentChildren } from 'preact';
 import { useEffect, useState } from 'preact/hooks';
+import { api } from '../data/api';
 import type { Item } from '../data/parse';
 import { setFocus } from './focus';
 import { go, openSearch, play, refresh } from './nav';
@@ -244,11 +245,39 @@ export function Status({
   return null;
 }
 
-export function videoMeta(item: Item | undefined): string[] {
+/** Channel · upload date · duration · % watched, for the details block above a row or grid. */
+export function videoMeta(item: Item | undefined, extra?: { channel?: string; date?: string }): string[] {
   if (!item) return [];
   if (item.kind === 'playlist') return [item.count, item.meta].filter(Boolean) as string[];
-  return [item.channel, item.duration, item.progress ? `${Math.round(item.progress)}% watched` : undefined].filter(
-    Boolean,
-  ) as string[];
+  return [
+    item.channel || extra?.channel,
+    item.published || extra?.date,
+    item.duration,
+    item.progress ? `${Math.round(item.progress)}% watched` : undefined,
+  ].filter(Boolean) as string[];
+}
+
+/**
+ * videoMeta for the focused tile. Feeds like History often leave out the channel or the upload date;
+ * when the focus rests on such a video, they are fetched from the video's details (once per video).
+ */
+export function useVideoMeta(item: Item | undefined): string[] {
+  const [extra, setExtra] = useState<{ id: string; channel?: string; date?: string } | null>(null);
+  const missing = item?.kind === 'video' && (!item.channel || !item.published) ? item.id : null;
+  useEffect(() => {
+    if (!missing) return;
+    let alive = true;
+    const t = setTimeout(() => {
+      api.details(missing).then(
+        (d) => alive && setExtra({ id: missing, channel: d.channel?.name, date: d.date }),
+        () => {},
+      );
+    }, 300);
+    return () => {
+      alive = false;
+      clearTimeout(t);
+    };
+  }, [missing]);
+  return videoMeta(item, extra && extra.id === item?.id ? extra : undefined);
 }
 
