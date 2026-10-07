@@ -106,7 +106,7 @@ export function back() {
         return;
       }
       // Watch progress changed: refresh rows that show it.
-      invalidate('home');
+      invalidate('home:history');
       invalidate('history');
       setStack(stack.slice(0, -1));
       return;

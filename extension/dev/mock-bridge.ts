@@ -8,7 +8,13 @@ const fixtures: Record<string, Promise<any>> = {};
 const fixture = (name: string) =>
   (fixtures[name] ??= fetch(`fixtures/${name}.json`).then((r) => r.json()));
 
-/** Channel fixture with watch progress and history date sections, as FEhistory looks. */
+/** The video played last; history lists it first, as YouTube does. */
+let lastPlayed = '';
+
+/**
+ * Channel fixture with watch progress and history date sections, as FEhistory looks.
+ * The video played last comes first.
+ */
 async function history() {
   const ch = structuredClone(await fixture('channel'));
   const lockups: any[] = [];
@@ -17,6 +23,8 @@ async function history() {
     if (n.lockupViewModel) lockups.push(n.lockupViewModel);
     for (const k in n) walk(n[k]);
   })(ch);
+  const at = lockups.findIndex((l) => l.contentId === lastPlayed);
+  if (at > 0) lockups.unshift(...lockups.splice(at, 1));
   lockups.forEach((l, i) => {
     if (i >= 8) return;
     l.contentImage.thumbnailViewModel.overlays.push({
@@ -93,6 +101,7 @@ const listeners = new Set<(s: PlayerStatus) => void>();
 const emit = () => status && listeners.forEach((l) => l({ ...status! }));
 
 function play(req: PlayRequest) {
+  lastPlayed = req.videoId;
   status = {
     videoId: req.videoId,
     title: '',

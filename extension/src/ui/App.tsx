@@ -31,10 +31,20 @@ function Screen({ route }: { route: Route }) {
 /** Keeps a focused element on screen and in view, whatever renders. */
 function useFocusKeeper(stage: HTMLElement) {
   useEffect(() => {
+    const reveal = (behavior: ScrollBehavior) => {
+      const el = elementFor(getState().focus[currentKey()]);
+      if (!el || el.closest('[data-manual-scroll]')) return;
+      el.scrollIntoView({ block: (el.dataset.block as ScrollLogicalPosition) ?? 'nearest', inline: 'nearest', behavior });
+    };
+
+    // New content (data loaded, list reordered): make sure something is focused and still in view.
     let timer = 0;
     const schedule = () => {
       clearTimeout(timer);
-      timer = window.setTimeout(ensureFocus, 0);
+      timer = window.setTimeout(() => {
+        ensureFocus();
+        reveal('instant');
+      }, 0);
     };
     const observer = new MutationObserver(schedule);
     observer.observe(stage, { childList: true, subtree: true });
@@ -49,15 +59,7 @@ function useFocusKeeper(stage: HTMLElement) {
       const screenChanged = key !== lastKey;
       lastFid = fid;
       lastKey = key;
-      setTimeout(() => {
-        const el = elementFor(fid);
-        if (!el || el.closest('[data-manual-scroll]')) return;
-        el.scrollIntoView({
-          block: (el.dataset.block as ScrollLogicalPosition) ?? 'nearest',
-          inline: 'nearest',
-          behavior: screenChanged ? 'instant' : 'smooth',
-        });
-      }, 0);
+      setTimeout(() => reveal(screenChanged ? 'instant' : 'smooth'), 0);
     });
     return () => {
       observer.disconnect();

@@ -23,6 +23,8 @@ export interface State {
   focus: Record<string, string>;
   /** last focused element per route key + zone, to come back to the same tile */
   zones: Record<string, string>;
+  /** zone and position of the focused element per route key, to land next to it if it disappears */
+  pos: Record<string, { zone: string; index: number }>;
   player: PlayerStatus | null;
   detailsOpen: boolean;
   toast: string | null;
@@ -62,6 +64,7 @@ let state: State = {
   stack: [{ screen: 'home' }],
   focus: {},
   zones: {},
+  pos: {},
   player: null,
   detailsOpen: false,
   toast: null,
@@ -83,7 +86,8 @@ export function setState(patch: Partial<State> | ((s: State) => Partial<State>))
   state = { ...state, ...p };
   if ('stack' in p || 'focus' in p || 'zones' in p) {
     try {
-      sessionStorage.setItem(STORAGE_KEY, JSON.stringify({ stack: state.stack, focus: state.focus, zones: state.zones }));
+      const { stack, focus, zones, pos } = state;
+      sessionStorage.setItem(STORAGE_KEY, JSON.stringify({ stack, focus, zones, pos }));
     } catch {
       /* storage full or blocked */
     }

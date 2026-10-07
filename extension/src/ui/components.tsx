@@ -7,6 +7,11 @@ import { current, routeKey, useStore, type Screen } from './store';
 
 export const SURFACES = ['#1d4180', '#2b569c', '#0f2450', '#143062'];
 
+/** Focus id for a tile: tied to the video or playlist, not to its position, so it survives reordering. */
+export function itemFid(prefix: string, item: Item): string {
+  return `${prefix}:${item.kind === 'playlist' ? 'p' : 'v'}${item.id}`;
+}
+
 export function cls(...parts: (string | false | null | undefined)[]) {
   return parts.filter(Boolean).join(' ');
 }
@@ -147,6 +152,7 @@ export function Tile({ item, index, fid, zone, focused, meta, isDefault, row }: 
       class={cls('tile', focused && 'focused')}
       data-fid={fid}
       data-zone={zone}
+      data-index={index}
       data-default={isDefault ? '' : undefined}
       data-block={row ? 'start' : undefined}
       onClick={() => {
@@ -184,7 +190,7 @@ export function Grid({
   hasMore?: boolean;
   more?: () => void;
 }) {
-  const idx = focused?.startsWith('grid:') ? Number(focused.slice(5)) : -1;
+  const idx = items.findIndex((item) => itemFid('grid', item) === focused);
   useEffect(() => {
     // Load the next page while the user is still a couple of rows away from the end.
     if (hasMore && more && idx >= items.length - 8) more();
@@ -196,9 +202,9 @@ export function Grid({
           key={item.kind + item.id}
           item={item}
           index={i}
-          fid={'grid:' + i}
+          fid={itemFid('grid', item)}
           zone="grid"
-          focused={focused === 'grid:' + i}
+          focused={focused === itemFid('grid', item)}
           meta={metaFor?.(item)}
           isDefault={i === 0}
         />

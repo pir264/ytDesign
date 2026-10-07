@@ -39,8 +39,10 @@ export function setFocus(fid: string, auto = false) {
   }
   const el = elementFor(fid);
   const zone = el?.dataset.zone;
+  const index = el?.dataset.index;
   setState((s) => ({
     focus: { ...s.focus, [key]: fid },
+    pos: zone && index != null && !auto ? { ...s.pos, [key]: { zone, index: Number(index) } } : s.pos,
     // Only what the user chose counts as "where I was" in a zone.
     zones: zone && !auto ? { ...s.zones, [key + '|' + zone]: fid } : s.zones,
   }));
@@ -69,6 +71,18 @@ export function ensureFocus() {
     wanted.delete(key);
     if (want !== fid || autoKeys.has(key)) setFocus(want);
     return;
+  }
+  // The remembered video is not in its row any more (e.g. watched to the end): once that row has
+  // loaded, take the video now at its place.
+  const pos = getState().pos[key];
+  if (want && pos) {
+    const zone = focusables().filter((e) => e.dataset.zone === pos.zone && e.dataset.index != null);
+    const near = zone[Math.min(pos.index, zone.length - 1)];
+    if (near?.dataset.fid) {
+      wanted.delete(key);
+      setFocus(near.dataset.fid);
+      return;
+    }
   }
   const def = defaultElement();
   if (el && (!autoKeys.has(key) || !def || def === el)) return;

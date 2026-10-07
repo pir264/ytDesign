@@ -4,7 +4,7 @@ import type { ComponentChildren } from 'preact';
 import { useEffect, useState } from 'preact/hooks';
 import { api, type ChannelHeader } from '../../data/api';
 import type { Channel, Item } from '../../data/parse';
-import { cls, Grid, Status, SURFACES, useFocused, videoMeta } from '../components';
+import { cls, Grid, itemFid, Status, SURFACES, useFocused, videoMeta } from '../components';
 import { invalidate, useAsync, useFeed } from '../data';
 import { setFocus } from '../focus';
 import { openChannel } from '../nav';
@@ -14,8 +14,7 @@ export function Results({ route }: { route: Route }) {
   const q = route.q ?? '';
   const f = useFocused();
   const feed = useFeed('results:' + q, (cont) => api.search(q, cont));
-  const idx = f?.startsWith('grid:') ? Number(f.slice(5)) : 0;
-  const item = feed.items[idx] ?? feed.items[0];
+  const item = feed.items.find((i) => itemFid('grid', i) === f) ?? feed.items[0];
   return (
     <div class="screen results">
       <div class="results-head">

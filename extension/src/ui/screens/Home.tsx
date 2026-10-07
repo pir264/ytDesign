@@ -1,7 +1,7 @@
 import { useEffect, useRef } from 'preact/hooks';
 import { api } from '../../data/api';
 import type { Item } from '../../data/parse';
-import { cls, Status, Tile, useFocused, videoMeta } from '../components';
+import { cls, itemFid, Status, Tile, useFocused, videoMeta } from '../components';
 import { useFeed } from '../data';
 import { useStore } from '../store';
 
@@ -51,14 +51,14 @@ export function Home() {
   if (f && shown.some((r) => f.startsWith(r.id + ':'))) lastTile.current = f;
   const tileFid = lastTile.current;
   const activeRow = shown.find((r) => tileFid?.startsWith(r.id + ':')) ?? shown[0];
-  const focusedItem = activeRow && tileFid ? activeRow.items[Number(tileFid.split(':')[1])] : activeRow?.items[0];
+  const focusIndex = Math.max(0, activeRow?.items.findIndex((item) => itemFid(activeRow.id, item) === tileFid) ?? 0);
+  const focusedItem = activeRow?.items[focusIndex];
 
   const loading = rows.some((r) => r.loading) || loggedIn === null;
 
   // Endless, like YouTube: a row loads more near its right end, and more recommendation rows
   // appear while moving down.
   const activeIndex = shown.indexOf(activeRow);
-  const focusIndex = tileFid ? Number(tileFid.split(':')[1]) : 0;
   useEffect(() => {
     if (!activeRow) return;
     if (activeRow.more && focusIndex >= activeRow.items.length - 5) activeRow.more();
@@ -94,9 +94,9 @@ export function Home() {
                     key={item.kind + item.id}
                     item={item}
                     index={i}
-                    fid={`${row.id}:${i}`}
+                    fid={itemFid(row.id, item)}
                     zone={row.id}
-                    focused={f === `${row.id}:${i}`}
+                    focused={f === itemFid(row.id, item)}
                     isDefault={ri === 0 && i === 0}
                     row
                   />
