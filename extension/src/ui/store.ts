@@ -29,6 +29,8 @@ export interface State {
   /** epoch ms of the last key press / real mouse move */
   activity: number;
   cursorHidden: boolean;
+  /** bumped to rebuild the current screen with fresh data */
+  refresh: number;
   /** null until the bridge reported the YouTube session */
   loggedIn: boolean | null;
 }
@@ -65,6 +67,7 @@ let state: State = {
   toast: null,
   activity: Date.now(),
   cursorHidden: false,
+  refresh: 0,
   loggedIn: null,
   ...restore(),
 };

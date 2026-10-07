@@ -3,7 +3,8 @@
 import { api } from '../data/api';
 import type { Item } from '../data/parse';
 import { invalidate } from './data';
-import { current, getState, setState, toast, type Route, type Screen } from './store';
+import { setFocus } from './focus';
+import { current, getState, routeKey, setState, toast, type Route, type Screen } from './store';
 
 declare const browser: any;
 
@@ -13,8 +14,33 @@ function setStack(stack: Route[]) {
   setState({ stack, detailsOpen: false });
 }
 
-export function go(screen: Exclude<Screen, 'search' | 'results' | 'channel' | 'player'>) {
+export function go(screen: Exclude<Screen, 'search' | 'results' | 'channel' | 'player'>, focus?: string) {
   setStack(screen === 'home' ? [{ screen: 'home' }] : [{ screen: 'home' }, { screen }]);
+  // Chosen from the top bar: keep the focus on that tab, so ← → can go on to the next one.
+  if (focus) setFocus(focus);
+}
+
+/** Data each screen shows, by cache key prefix. */
+const FEEDS: Partial<Record<Screen, string[]>> = {
+  home: ['home:'],
+  history: ['history'],
+  playlists: ['playlists'],
+  subs: ['subs'],
+};
+
+/** Reload the current screen, like F5 but without reloading YouTube underneath. */
+export function refresh() {
+  const route = current();
+  const key = routeKey(route);
+  for (const prefix of FEEDS[route.screen] ?? []) invalidate(prefix);
+  if (route.screen === 'results') invalidate('results:' + route.q);
+  if (route.screen === 'channel') invalidate('channel:' + route.channelId);
+  // Start at the top again: forget the remembered tiles, but keep the focus where it is (top bar).
+  setState((s) => ({
+    refresh: s.refresh + 1,
+    zones: Object.fromEntries(Object.entries(s.zones).filter(([k]) => !k.startsWith(key + '|') || k.endsWith('|top'))),
+  }));
+  toast('Refreshed');
 }
 
 export function openSearch() {

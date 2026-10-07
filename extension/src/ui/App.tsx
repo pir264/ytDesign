@@ -71,6 +71,7 @@ const WITH_TOPBAR = new Set(['home', 'results', 'history', 'playlists', 'subs', 
 export function App({ stage }: { stage: HTMLElement }) {
   const route = useStore((s) => s.stack[s.stack.length - 1]);
   const cursorHidden = useStore((s) => s.cursorHidden);
+  const refresh = useStore((s) => s.refresh);
   const toast = useStore((s) => s.toast);
   useFocusKeeper(stage);
 
@@ -84,7 +85,7 @@ export function App({ stage }: { stage: HTMLElement }) {
   const active = route.screen === 'channel' ? 'subs' : route.screen;
   return (
     <>
-      <Screen key={routeKey(route)} route={route} />
+      <Screen key={routeKey(route) + '#' + refresh} route={route} />
       {WITH_TOPBAR.has(route.screen) && <TopBar active={active} />}
       <div class={cls('toast', toast && 'show')}>{toast}</div>
     </>

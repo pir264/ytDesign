@@ -2,8 +2,8 @@ import type { ComponentChildren } from 'preact';
 import { useEffect, useState } from 'preact/hooks';
 import type { Item } from '../data/parse';
 import { setFocus } from './focus';
-import { go, openSearch, play } from './nav';
-import { routeKey, useStore, type Screen } from './store';
+import { go, openSearch, play, refresh } from './nav';
+import { current, routeKey, useStore, type Screen } from './store';
 
 export const SURFACES = ['#1d4180', '#2b569c', '#0f2450', '#143062'];
 
@@ -111,7 +111,7 @@ export function TopBar({ active }: { active?: Screen }) {
             class={cls(active === n.id && 'active', f === 'top:' + n.id && 'focused')}
             data-fid={'top:' + n.id}
             data-zone="top"
-            onClick={() => go(n.id)}
+            onClick={() => (current().screen === n.id ? refresh() : go(n.id, 'top:' + n.id))}
           >
             <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
               <path d={n.d} />
